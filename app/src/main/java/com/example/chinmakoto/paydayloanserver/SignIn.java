@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+
 import com.example.chinmakoto.paydayloanserver.Model.DaoAddress;
 import com.example.chinmakoto.paydayloanserver.Model.User;
 import com.google.android.gms.common.internal.service.Common;
@@ -22,6 +23,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class SignIn extends AppCompatActivity {
     EditText edtPhone,edtPassword;
@@ -78,16 +80,16 @@ public class SignIn extends AppCompatActivity {
                                     {
                                         //deployed:
                                         try {
-                                            Deploy.deploy();
+                                            CredentialSamples accressaddress=new CredentialSamples();
                                         }
                                         catch (java.lang.Exception e) {
                                             //dont know whats supposed to happen OTL life has failed.
                                         }
 
                                         //Save the deployed address to the firebase:
-                                        String theAddress = Deploy.dao.getContractAddress();
-                                        DaoAddress address=new DaoAddress(theAddress);
-                                        DAOdb.child(String.valueOf(System.currentTimeMillis())).setValue(address);
+                                        //String theAddress = Deploy.dao.getContractAddress();
+                                        //DaoAddress address=new DaoAddress(theAddress);
+                                        //DAOdb.child(String.valueOf(System.currentTimeMillis())).setValue(address);
 
 
 
@@ -95,7 +97,7 @@ public class SignIn extends AppCompatActivity {
                                         String key= user.getPhone();
                                         DatabaseReference deployRef=users.child(key);
                                         Map<String,Object> deployUpdate=new HashMap<>();
-                                        String deploytrue="true";//TODO add final to the true
+                                        final String deploytrue="true";//TODO add final to the true or empty out
                                         deployUpdate.put("Deploy",deploytrue);
                                         deployRef.updateChildren(deployUpdate);
                                         Toast.makeText(SignIn.this,"depoly status is now: "+user.getDeploy(),Toast.LENGTH_LONG).show();
@@ -121,12 +123,22 @@ public class SignIn extends AppCompatActivity {
 
 
                                     }
+                                    //LOG IN AND DEPLOYED
 
                                     Toast.makeText(SignIn.this, "Sign in Successfully", Toast.LENGTH_SHORT).show();
                                     Intent homeIntent= new Intent(SignIn.this,Home.class);
                                     com.example.chinmakoto.paydayloanserver.Common.Common.currentUser =user;
                                     startActivity(homeIntent);
+                                    user.setCredentials(CredentialSamples.one);//TODO customize user wallet
+
+                                    try{
+                                        Deploy.loadUp(user.getCredentials());
+
+                                    }catch (java.lang.Exception E){
+
+                                    }
                                     finish();
+
 
                                 } else {
                                     Toast.makeText(SignIn.this, "Wrong Password or Staff name, please try again.", Toast.LENGTH_SHORT).show();

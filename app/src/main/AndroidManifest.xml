@@ -16,13 +16,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".SignIn" />
+
+        <activity android:name=".Deploy">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+
         <activity
             android:name=".Home"
             android:label="@string/title_activity_home"
             android:theme="@style/AppTheme" />
         <activity android:name=".Lottery" />
-        <activity android:name=".RunLottery"></activity>
+
+        <activity android:name=".RunLottery">
+
+        </activity>
     </application>
 
 </manifest>

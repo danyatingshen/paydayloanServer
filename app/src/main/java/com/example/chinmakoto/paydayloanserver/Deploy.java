@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.kenai.jffi.Main;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -43,61 +44,41 @@ public class Deploy extends AppCompatActivity {
     public static final Logger log = LoggerFactory.getLogger(MainActivity.class);
     public static TransactionReceipt transactionReceipt;
     public static DAO dao;
+    static String daoContractAddress = "0x6e8894e6ab680237faf54c2ff40e651da5d4231a";
     public static Web3j web3j;
     public static Credentials credentials;
     public static BigInteger gasP = DefaultGasProvider.GAS_PRICE;
     public static BigInteger gasL = DefaultGasProvider.GAS_LIMIT;
 
-    public Deploy() throws Exception {
 
+    public static void generateNewWallet(String password, String pathToDestination) throws Exception{
+        WalletUtils.generateNewWalletFile(password, new File(pathToDestination));
     }
-    /**
 
-     public static Credentials logIn() throws Exception {
-     Web3j web3j = new JsonRpc2_0Web3j(new HttpService("https://ropsten.infura.io/v3/9ee9974d9a7a4b7f80fa5e8f632a8aa1"));
-     log.info("Connected to Ethereum client version: "
-     + web3j.web3ClientVersion().send().getWeb3ClientVersion());
-     Credentials credentials =
-     WalletUtils.loadCredentials(
-     "<hello>",
-     "/Users/lucyyu540/Library/Ethereum/testnet/keystore/<UTC--2018-07-31T14-35-24.353000000Z--56e50d0ecada2fd6de5aba3fc5e6e597875b012d.json>");
-     log.info("Credentials loaded");
-     return credentials;
-     }
-     */
-
-
-    public static void deploy() throws Exception {
+    public static void loadUp(Credentials cred) throws Exception {
         web3j = Web3j.build(new InfuraHttpService("https://ropsten.infura.io/9ee9974d9a7a4b7f80fa5e8f632a8aa1"));
         //web3j = new JsonRpc2_0Web3j(new HttpService("https://ropsten.infura.io/v3/9ee9974d9a7a4b7f80fa5e8f632a8aa1"));
-        //log.info("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion());
-        credentials =
-                WalletUtils.loadCredentials(
-                        "<hello>",
-                        "/Users/chinmakoto/LucyWallet.json");
+        log.info("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion());
+
+        credentials = credentials;
         log.info("Credentials loaded");
 
-        //deployed
-        log.info("Deploying smart contract");
-        BigInteger totalSupply = BigInteger.valueOf(1000);
+        dao = DAO.load(daoContractAddress, web3j, credentials, gasP, gasL);
+    }
 
-        Token token = Token.deploy(
-                web3j, credentials,
-                gasP, gasL, totalSupply).send();
-        String tokenContractAddress = token.getContractAddress();
-        log.info("Token contract deployed to address " + tokenContractAddress);
 
-        Lottery lottery = Lottery.deploy(
-                web3j, credentials,
-                gasP, gasL).send();
-        String lotteryContractAddress = lottery.getContractAddress();
-        log.info("Lottery contract deployed to address " + lotteryContractAddress);
+    public static void loadUp(String password, String pathToFile) throws Exception {
+        web3j = Web3j.build(new InfuraHttpService("https://ropsten.infura.io/9ee9974d9a7a4b7f80fa5e8f632a8aa1"));
+        //web3j = new JsonRpc2_0Web3j(new HttpService("https://ropsten.infura.io/v3/9ee9974d9a7a4b7f80fa5e8f632a8aa1"));
+        log.info("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion());
 
-        dao = DAO.deploy(
-                web3j, credentials,
-                gasP, gasL, lotteryContractAddress, tokenContractAddress).send();
-        String daoContractAddress = dao.getContractAddress();
-        log.info("DAO contract deployed to address " + daoContractAddress);
+        credentials =
+                WalletUtils.loadCredentials(
+                        password,
+                        pathToFile);
+        log.info("Credentials loaded");
+
+        dao = DAO.load(daoContractAddress, web3j, credentials, gasP, gasL);
 
     }
 
